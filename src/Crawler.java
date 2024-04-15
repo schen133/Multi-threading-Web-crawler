@@ -75,6 +75,33 @@ public class Crawler {
             // for each li, get the a tag's href address and append it
             String tempPaginationUrl = li.select("a").attr("href");
             topic.addPageURL(tempPaginationUrl);
+
+            // UNCOMMENT THIS
+            // setUpReviewsOfCurrentPage(topic, tempPaginationUrl, client);
+
+        }
+        // TESTING, only crawl for one page url
+        setUpReviewsOfCurrentPage(topic, topic.getFirstPageUrlString(), client);
+
+        // wait, for each pagniation url we have, we can already grab the data we need..
+
+    }
+
+    public static void setUpReviewsOfCurrentPage(Topic topic, String pageUrl, HttpClient client) {
+        String responseEntityString = sendGetRequest(client, pageUrl);
+
+        Document doc = processContent(responseEntityString);
+
+        Elements reviewDivs = doc.select("div.search-results-item-body");
+
+        for (Element reviewDiv : reviewDivs) {
+            Element h_3 = reviewDiv.select("h3").first();
+            String reviewTopic = topic.getTopicName();
+            String reviewUrl = h_3.select("a").attr("href");
+            String reviewTitle = h_3.select("a").text();
+            String reviewAuthor = reviewDiv.select("div.search-result-authors").text();
+            String reviewDate = reviewDiv.select("div.search-result-date").text();
+            topic.addReview(new Review(reviewUrl, reviewTopic, reviewTitle, reviewAuthor, reviewDate));
         }
 
         //
@@ -113,19 +140,6 @@ public class Crawler {
     public static Document processContent(String responseEntityString) {
         Document resDoc = Jsoup.parse(responseEntityString);
         return resDoc;
-
-        // BufferedReader br = new BufferedReader(new InputStreamReader(content));
-        // StringBuilder sb = new StringBuilder();
-        // String line;
-        // try {
-        // while ((line = br.readLine()) != null) {
-        // sb.append(line);
-        // }
-        // } catch (IOException e) {
-        // System.out.println("Error reading content: " + e.getMessage());
-        // }
-        // Document resDocument = Jsoup.parse(sb.toString());
-        // return resDocument;
     }
 
 }

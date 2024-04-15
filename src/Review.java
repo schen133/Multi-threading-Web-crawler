@@ -34,4 +34,12 @@ public class Review {
         return date;
     }
 
+    public void printReview() {
+        System.out.println("Review URL: " + url);
+        System.out.println("Review Topic: " + topic);
+        System.out.println("Review Title: " + title);
+        System.out.println("Review Author: " + author);
+        System.out.println("Review Date: " + date + "\n");
+    }
+
 }

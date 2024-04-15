@@ -7,12 +7,13 @@ public class Topic {
     private ArrayList<String> pageURLS;
 
     // list of views in this one?
-    private Review[] reviews;
+    private ArrayList<Review> reviews;
 
     public Topic(String topicName, String url) {
         this.url = url;
         this.topicName = topicName;
         this.pageURLS = new ArrayList<String>();
+        this.reviews = new ArrayList<Review>();
     }
 
     public void setTotalPage(int totalPage) {
@@ -33,6 +34,15 @@ public class Topic {
         for (String url : pageURLS) {
             System.out.println(url);
         }
+    }
+    public String getFirstPageUrlString() {
+        return pageURLS.get(0);
+    }
+    public void addReview(Review review) {
+        reviews.add(review);
+    }
+    public ArrayList<Review> getReviews() {
+        return reviews;
     }
 
 }
