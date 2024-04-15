@@ -13,6 +13,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.entity.ContentType;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.client.config.RequestConfig;
+
 // jsoup library for html parsing 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,16 +24,17 @@ import org.jsoup.Jsoup;
 // uses parser to get information, 
 public class Crawler {
 
-    // get the document of the Home page
-    public static void getHomePageDoc() {
-        String topicsEntryURL = "https://www.cochranelibrary.com/cdsr/reviews/topics";
+    // Return an arraylist of topics, review array of each topic still empty
+    public static ArrayList<Topic> crawlHomePage(String url) {
+
+        String topicsEntryURL = url;
 
         HttpClient client = HttpClients.createDefault();
 
         // should send a request and return us the content
-        String responseEntitiyString = sendGetRequest(client, topicsEntryURL);
+        String responseEntityString = sendGetRequest(client, topicsEntryURL);
         // it returns a string, so pass that inside procee and get a document
-        Document doc = processContent(responseEntitiyString);
+        Document doc = processContent(responseEntityString);
         // iterate document and get all topic name plus url
 
         // how many topics are there? it should be each li element in the DOM
@@ -40,8 +43,8 @@ public class Crawler {
         // Elements topLis = topDiv.select("li");
         Elements allLis = doc.select("li.browse-by-list-item");
         // for (Element li : allLis) {
-        //     System.out.println("This is li content");
-        //     System.out.println(li.text());
+        // System.out.println("This is li content");
+        // System.out.println(li.text());
         // }
 
         ArrayList<Topic> topics = new ArrayList<Topic>();
@@ -51,34 +54,48 @@ public class Crawler {
             // add to arraylist of topics
             topics.add(new Topic(tempName, tempURL));
         }
-        
-        for (Topic topic : topics) {
-            
-            System.out.println("Topic name: " + topic.getTopicName());
-            System.out.println("Topic URL: " + topic.getTopicURL());
+        return topics;
+    }
+
+    // takes in a topic instance and modify its information
+    public static void crawlTopicPage(Topic topic) {
+        HttpClient client = HttpClients.createDefault();
+        // String responseEntityString = sendGetRequest(client, topic.getTopicURL());
+        String responseEntityString = sendGetRequest(client, topic.getTopicURL());
+
+        Document doc = processContent(responseEntityString);
+
+        Element paginationUL = doc.select("ul.pagination-page-list").first();
+
+        // for each page, get the url and add to arraylist
+        Elements paginiationLis = paginationUL.select("li");
+
+        // get all pagination urls for each topic page
+        for (Element li : paginiationLis) {
+            // for each li, get the a tag's href address and append it
+            String tempPaginationUrl = li.select("a").attr("href");
+            topic.addPageURL(tempPaginationUrl);
         }
 
+        //
+
     }
 
-    // get the document of the topic page
-    public static Document getTopicPageDoc(String topicURL) {
-        HttpClient client = HttpClients.createDefault();
-        String responseEntityString = sendGetRequest(client, topicURL);
-        Document doc = processContent(responseEntityString);
-        return doc;
-    }
-
+    // TODO@schen133: heavy function, need more error handling
     // all purpose get request method -> String of entity
     public static String sendGetRequest(HttpClient client, String url) {
         try {
             HttpGet request = new HttpGet(url);
             request.setHeader("User-Agent", "Testing/1.0");
+            // the topic page is redirecting to another page, so we need to allow circular
+            request.setConfig(RequestConfig.custom().setCircularRedirectsAllowed(true).build());
+
             HttpResponse response = client.execute(request);
             int responseStatusCode = response.getStatusLine().getStatusCode();
 
             if (responseStatusCode == 200) {
-                System.out.println("Response received successfully.");
-                System.out.println("Response status code: " + responseStatusCode);
+                // System.out.println("Response received successfully.");
+                // System.out.println("Response status code: " + responseStatusCode);
                 HttpEntity responseEntity = response.getEntity();
                 String responseString = EntityUtils.toString(responseEntity);
                 return responseString;
