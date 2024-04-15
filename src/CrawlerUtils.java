@@ -102,15 +102,10 @@ public class CrawlerUtils {
     // access the pagination url and get all reviews of one page
     public static void setUpReviewsOfCurrentPage(Topic topic, String pageUrl) {
         HttpClient client = HttpClients.createDefault();
+        System.out.println("make request to \n\n" + pageUrl);
+        System.out.println("\n\n");
+
         String responseEntityString = sendGetRequest(client, pageUrl);
-        System.out.println("make request to");
-        
-
-
-
-        // if (responseEntityString != null) {
-        // System.out.println("There is a response entity string for page!");
-        // }
 
         Document doc = processContent(responseEntityString);
         // System.out.println(doc);
@@ -130,8 +125,7 @@ public class CrawlerUtils {
 
             topic.addReview(new Review(reviewUrl, reviewTopic, reviewTitle, reviewAuthor, reviewDate));
         }
-        // System.out.println("Reviews of topic: " + topic.getTopicName() + " has size:
-        // " + topic.getReviews().size());
+        System.out.println("Reviews of topic: " + topic.getTopicName() + " has size:" + topic.getReviews().size());
 
     }
 
@@ -150,6 +144,7 @@ public class CrawlerUtils {
             if (responseStatusCode == 200) {
                 // System.out.println("Response received successfully.");
                 // System.out.println("Response status code: " + responseStatusCode);
+                String testingHtml = "output.html";
                 HttpEntity responseEntity = response.getEntity();
                 String responseString = EntityUtils.toString(responseEntity);
 
