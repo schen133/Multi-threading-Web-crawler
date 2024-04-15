@@ -35,12 +35,8 @@ public class Crawler {
         String responseEntityString = sendGetRequest(client, topicsEntryURL);
         // it returns a string, so pass that inside procee and get a document
         Document doc = processContent(responseEntityString);
-        // iterate document and get all topic name plus url
 
-        // how many topics are there? it should be each li element in the DOM
-        // Elements topLis = doc.select("li.bro");
-        // Element topDiv = doc.select("dl.dl-section").first();
-        // Elements topLis = topDiv.select("li");
+        // iterate document and get all topic name plus url
         Elements allLis = doc.select("li.browse-by-list-item");
         // for (Element li : allLis) {
         // System.out.println("This is li content");
@@ -71,20 +67,19 @@ public class Crawler {
         Elements paginiationLis = paginationUL.select("li");
 
         // get all pagination urls for each topic page
+        int totalPages = 0;
         for (Element li : paginiationLis) {
+            totalPages++;
             // for each li, get the a tag's href address and append it
             String tempPaginationUrl = li.select("a").attr("href");
             topic.addPageURL(tempPaginationUrl);
 
             // UNCOMMENT THIS
             // setUpReviewsOfCurrentPage(topic, tempPaginationUrl, client);
-
         }
+        topic.setTotalPage(totalPages);
         // TESTING, only crawl for one page url
-        setUpReviewsOfCurrentPage(topic, topic.getFirstPageUrlString(), client);
-
-        // wait, for each pagniation url we have, we can already grab the data we need..
-
+        // setUpReviewsOfCurrentPage(topic, topic.getFirstPageUrlString(), client);
     }
 
     public static void setUpReviewsOfCurrentPage(Topic topic, String pageUrl, HttpClient client) {
@@ -103,9 +98,6 @@ public class Crawler {
             String reviewDate = reviewDiv.select("div.search-result-date").text();
             topic.addReview(new Review(reviewUrl, reviewTopic, reviewTitle, reviewAuthor, reviewDate));
         }
-
-        //
-
     }
 
     // TODO@schen133: heavy function, need more error handling

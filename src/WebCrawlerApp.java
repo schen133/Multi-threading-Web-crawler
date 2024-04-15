@@ -13,10 +13,10 @@ public class WebCrawlerApp {
         String topicsEntryURL = "https://www.cochranelibrary.com/cdsr/reviews/topics";
 
         ArrayList<Topic> topics = Crawler.crawlHomePage(topicsEntryURL);
-        Crawler.crawlTopicPage(topics.get(0));
-        for (Review review : topics.get(0).getReviews()) {
-            review.printReview();
-        }
+        // Crawler.crawlTopicPage(topics.get(0));
+        // for (Review review : topics.get(0).getReviews()) {
+        // review.printReview();
+        // }
 
         for (Topic topic : topics) {
             // System.out.println("Topic name: " + topic.getTopicName());
@@ -24,21 +24,18 @@ public class WebCrawlerApp {
 
             // crawl each topic's url
             // pass in each topic instance's reference
-            // Crawler.crawlTopicPage(topic);
 
-            // each topic now has bunch of pagniation urls
+            // heavy
+            Crawler.crawlTopicPage(topic);
+            // each topic should have bunch of pagniation urls in page urls variable now
 
-            // we can do multi-threading here i guess. So pages in total, we multi-thread
-            // and access different pages at the same time
+            // for each page it has to visit, we do with a different thread...
+            // that way we finish off each topic faster?
+            // setUpReviewsOfCurrentPage(topic, tempPaginationUrl, client);
+            
 
-            // go into each url and crawl for all individual reviews
 
         } // Inserted closing curly brace here
-
-        // open a thread for each topic, and do crawling for each topic individually
-        // one by one takes too long...
-
-        // focus on writing the function for completing a single topic first
 
     }
 

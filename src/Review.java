@@ -34,6 +34,7 @@ public class Review {
         return date;
     }
 
+    // Helper function
     public void printReview() {
         System.out.println("Review URL: " + url);
         System.out.println("Review Topic: " + topic);
