@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+
 public class Topic {
 
     private String url;
@@ -27,20 +28,25 @@ public class Topic {
     public String getTopicURL() {
         return url;
     }
+
     public void addPageURL(String url) {
         pageURLS.add(url);
     }
+
     public void printAllPageURLS() {
         for (String url : pageURLS) {
             System.out.println(url);
         }
     }
+
     public String getFirstPageUrlString() {
         return pageURLS.get(0);
     }
+
     public void addReview(Review review) {
         reviews.add(review);
     }
+
     public ArrayList<Review> getReviews() {
         return reviews;
     }
