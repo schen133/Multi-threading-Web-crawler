@@ -23,15 +23,16 @@ public class WebCrawlerApp {
         System.out.println("Crawling topic page...");
 
         List<Crawler> crawlers = new ArrayList<Crawler>();
-        for (Topic topic : topics) {
-            System.out.print(topic.getTopicName() + " | ");
-        }
-        System.out.println("\n");
-        
-        
-        for (Topic topic : topics) {
+        // for (Topic topic : topics) {
+        // System.out.print(topic.getTopicName() + " | ");
+        // }
+        // System.out.println("\n");
+
+        // for (Topic topic : topics) {
+        for (int i = 0; i < 2; i++) {
+            Topic topic = topics.get(i);
             // CrawlerUtils.crawlTopicPage(topic);
-            Crawler crawler = new Crawler(topic);
+            Crawler crawler = new Crawler(topic, Crawler.CrawlType.CRAWL_INITIAL_TOPIC_URL);
             crawlers.add(crawler);
             crawler.start();
 
@@ -44,58 +45,68 @@ public class WebCrawlerApp {
                 e.printStackTrace();
             }
         }
-        System.out.println("All crawlers are done.");
+        System.out.println("All initial topic crawlers are done.");
 
-        // Crawler.crawlTopicPage(topics.get(0));
+        // for (Topic topic : topics) {
+        for (int i = 0; i < 1; i++) {
+            Topic topic = topics.get(i);
+            // for each url
+            ArrayList<String> pageURLS = topic.getPageURLS();
+            List<Crawler> pageCrawlers = new ArrayList<Crawler>();
+            for (String pageURL : pageURLS) {
+                Crawler crawler = new Crawler(topic, Crawler.CrawlType.CRAWL_PAGE_URL, pageURL);
+                pageCrawlers.add(crawler);
+                crawler.start();
+            }
+            // pause, wait for crawling of all pages
+            // should be ok if order of review doesn't matter, we just simutanously crawl
+            // each page of a topic and add reviews to it
+            for (Crawler crawler : pageCrawlers) {
+                try {
+                    crawler.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out
+                    .println("All page crawlers for topic: " + topic.getTopicName() + " are done. Reviews are setup!");
+        }
+
         long endTime = System.currentTimeMillis();
         double duration = (endTime - startTime) / 1000.0;
         System.out.println("Time taken to crawl all topic page: " + duration + " seconds");
         System.out.println("total topics: " + topics.size());
 
-        // this gets all pagination urls for one topic
+        for (int i = 0; i < 1; i++) {
+            Topic topic = topics.get(i);
+            ArrayList<Review> reviews = topic.getReviews();
+            System.out.println("Topic: " + topic.getTopicName() + " has " + reviews.size() + " reviews.");
 
-        // Crawler.crawlTopicPage(topics.get(0));
-
-        // let's do a multi-thread here to get visit all topic pages
-
-        // and fill up all
-
-        // crawl for 10 times, once that's done, we have urls for each review
-
-        // 5 pages each topic, 20 topics
-        // we should crawl separate for each topic?
-        // let's do each topic, since that's our function's logic
-        // or should we crawl each topic one by one, but start threads on each page
-
-        // if each topic's pages are very different, then it would be better
-        // multithread the pages
-
-        // but if all are almost the same, we can just multithread each topic
-        //
-        // each page has
+            for (Review review : reviews) {
+                review.printReview();
+            }
+        }
+        // now for each topic, for each page in pageURLS, start a thread to crawl
 
         File file = new File("cochrane_reviews.txt");
         writeToFile(topics, file);
     }
 
-    //
-    // public String parseTime
-
     public static void writeToFile(ArrayList<Topic> topics, File file) {
-        Topic topic = topics.get(0);
-        ArrayList<Review> reviews = topic.getReviews();
-
-        try {
-            FileWriter writer = new FileWriter(file);
-            writer.write("testrun\n\n");
-            writer.write("Topic: " + topic.getTopicName() + "\n\n");
-            for (Review review : reviews) {
-                String tempForReview = Parser.getDesiredReviewString(review);
-                writer.write(tempForReview + "\n\n");
+        for (Topic topic : topics) {
+            ArrayList<Review> reviews = topic.getReviews();
+            try {
+                FileWriter writer = new FileWriter(file);
+                // writer.write("testrun\n\n");
+                writer.write("Topic: " + topic.getTopicName() + "\n\n");
+                for (Review review : reviews) {
+                    String tempForReview = Parser.getDesiredReviewString(review);
+                    writer.write(tempForReview + "\n\n");
+                }
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

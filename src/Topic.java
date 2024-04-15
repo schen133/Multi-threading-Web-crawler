@@ -38,6 +38,9 @@ public class Topic {
             System.out.println(url);
         }
     }
+    public ArrayList<String> getPageURLS() {
+        return pageURLS;
+    }
 
     public String getFirstPageUrlString() {
         return pageURLS.get(0);

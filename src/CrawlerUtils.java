@@ -70,6 +70,15 @@ public class CrawlerUtils {
 
         Element paginationUL = doc.select("ul.pagination-page-list").first();
 
+        // else it could be the case that there is no ul, just one page. so we only
+        // append the topic url
+        if (paginationUL == null) {
+            // System.out.println("No pagination ul found for topic: " +
+            topic.addPageURL(topic.getTopicURL());
+            // return to prevent looking for lis from ul
+            return;
+        }
+
         // for each page, get the url and add to arraylist
         Elements paginiationLis = paginationUL.select("li");
 
@@ -91,12 +100,23 @@ public class CrawlerUtils {
     }
 
     // access the pagination url and get all reviews of one page
-    public static void setUpReviewsOfCurrentPage(Topic topic, String pageUrl, HttpClient client) {
+    public static void setUpReviewsOfCurrentPage(Topic topic, String pageUrl) {
+        HttpClient client = HttpClients.createDefault();
         String responseEntityString = sendGetRequest(client, pageUrl);
+        System.out.println("make request to");
+        
+
+
+
+        // if (responseEntityString != null) {
+        // System.out.println("There is a response entity string for page!");
+        // }
 
         Document doc = processContent(responseEntityString);
+        // System.out.println(doc);
 
         Elements reviewDivs = doc.select("div.search-results-item-body");
+        // System.out.println("Review dic" + reviewDivs);
 
         for (Element reviewDiv : reviewDivs) {
             Element h_3 = reviewDiv.select("h3").first();
@@ -106,8 +126,13 @@ public class CrawlerUtils {
             String reviewAuthor = reviewDiv.select("div.search-result-authors").text();
             String reviewDate = reviewDiv.select("div.search-result-date").text();
             reviewDate = Parser.parseDate(reviewDate);
+            // System.out.println("review name: " + reviewTitle);
+
             topic.addReview(new Review(reviewUrl, reviewTopic, reviewTitle, reviewAuthor, reviewDate));
         }
+        // System.out.println("Reviews of topic: " + topic.getTopicName() + " has size:
+        // " + topic.getReviews().size());
+
     }
 
     // TODO@schen133: heavy function, need more error handling
@@ -127,19 +152,24 @@ public class CrawlerUtils {
                 // System.out.println("Response status code: " + responseStatusCode);
                 HttpEntity responseEntity = response.getEntity();
                 String responseString = EntityUtils.toString(responseEntity);
+
                 return responseString;
             } else {
-                System.out.println("Request failed..");
+                System.out.println("request code not 200");
+
                 return null;
             }
         } catch (IOException e) {
-            System.out.println("Error occurred while sending get request: " + e.getMessage());
+            // System.out.println("Error occurred while sending get request: " +
+            // e.getMessage());
+            System.out.println("some other shit went wrong");
             return null;
         }
     }
 
     // all purpose string -> document method
     public static Document processContent(String responseEntityString) {
+
         Document resDoc = Jsoup.parse(responseEntityString);
         return resDoc;
     }
