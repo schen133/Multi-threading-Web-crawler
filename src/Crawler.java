@@ -14,7 +14,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.http.client.config.RequestConfig;
-
 // jsoup library for html parsing 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -79,9 +78,10 @@ public class Crawler {
         }
         topic.setTotalPage(totalPages);
         // TESTING, only crawl for one page url
-        // setUpReviewsOfCurrentPage(topic, topic.getFirstPageUrlString(), client);
+        setUpReviewsOfCurrentPage(topic, topic.getFirstPageUrlString(), client);
     }
 
+    // access the pagination url and get all reviews of one page
     public static void setUpReviewsOfCurrentPage(Topic topic, String pageUrl, HttpClient client) {
         String responseEntityString = sendGetRequest(client, pageUrl);
 
@@ -96,6 +96,7 @@ public class Crawler {
             String reviewTitle = h_3.select("a").text();
             String reviewAuthor = reviewDiv.select("div.search-result-authors").text();
             String reviewDate = reviewDiv.select("div.search-result-date").text();
+            reviewDate = Parser.parseDate(reviewDate);
             topic.addReview(new Review(reviewUrl, reviewTopic, reviewTitle, reviewAuthor, reviewDate));
         }
     }

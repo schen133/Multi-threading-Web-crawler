@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class WebCrawlerApp {
 
@@ -13,30 +16,33 @@ public class WebCrawlerApp {
         String topicsEntryURL = "https://www.cochranelibrary.com/cdsr/reviews/topics";
 
         ArrayList<Topic> topics = Crawler.crawlHomePage(topicsEntryURL);
-        // Crawler.crawlTopicPage(topics.get(0));
-        // for (Review review : topics.get(0).getReviews()) {
-        // review.printReview();
-        // }
 
-        for (Topic topic : topics) {
-            // System.out.println("Topic name: " + topic.getTopicName());
-            // System.out.println("Topic URL: " + topic.getTopicURL());
+        // this gets all pagination urls for one topic  
+        Crawler.crawlTopicPage(topics.get(0));
 
-            // crawl each topic's url
-            // pass in each topic instance's reference
+        File file = new File("cochrane_reviews.txt");
 
-            // heavy
-            Crawler.crawlTopicPage(topic);
-            // each topic should have bunch of pagniation urls in page urls variable now
-
-            // for each page it has to visit, we do with a different thread...
-            // that way we finish off each topic faster?
-            // setUpReviewsOfCurrentPage(topic, tempPaginationUrl, client);
-            
-
-
-        } // Inserted closing curly brace here
+        writeToFile(topics, file);
 
     }
 
+    //
+    // public String parseTime
+
+    public static void writeToFile(ArrayList<Topic> topics, File file) {
+        Topic topic = topics.get(0);
+        ArrayList<Review> reviews = topic.getReviews();
+
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write("Topic: " + topic.getTopicName() + "\n\n");
+            for (Review review : reviews) {
+                String tempForReview = Parser.getDesiredReviewString(review);
+                writer.write(tempForReview + "\n\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
