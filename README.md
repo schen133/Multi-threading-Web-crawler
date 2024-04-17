@@ -6,8 +6,7 @@ https://hc.apache.org/downloads.cgi <br>
 Jsoup @1.17.2<br>
 https://jsoup.org/download<br>
 
-How to compile and execute program:
-
+How to compile and execute program:<br>
 Compilation:<br>
 javac -cp ".:lib/*" -d ./bin src/*
 
