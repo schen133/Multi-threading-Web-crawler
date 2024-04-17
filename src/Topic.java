@@ -20,6 +20,9 @@ public class Topic {
     public void setTotalPage(int totalPage) {
         this.totalPage = totalPage;
     }
+    public void incrementTotalPage() {
+        this.totalPage++;
+    }
 
     public String getTopicName() {
         return topicName;
@@ -33,11 +36,16 @@ public class Topic {
         pageURLS.add(url);
     }
 
+    public String getTotalPage() {
+        return Integer.toString(totalPage);
+    }
+
     public void printAllPageURLS() {
         for (String url : pageURLS) {
             System.out.println(url);
         }
     }
+
     public ArrayList<String> getPageURLS() {
         return pageURLS;
     }

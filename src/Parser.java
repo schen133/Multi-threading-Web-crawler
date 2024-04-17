@@ -47,4 +47,14 @@ public class Parser {
         return res;
     }
 
+    public static String parseReviewUrl(String url) {
+        String prefix = "http://onlinelibrary.wiley.com/";
+
+        if (url.length() > 4) {
+            return prefix + url.substring(6);
+        }
+        return url;
+
+    }
+
 }
